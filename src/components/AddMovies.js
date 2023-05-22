@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AddMovies.css";
-const AddMovies = (props) => {
+const AddMovies = ({ onAddMovie }) => {
   const [title, setTitle] = useState("");
   const [openingtext, setOpeningOpeningText] = useState("");
   const [releasedate, setreleaseDate] = useState("");
@@ -13,7 +13,10 @@ const AddMovies = (props) => {
       releasedate: releasedate,
     };
 
-    props.onAddMovie(MoviesObject);
+    onAddMovie(MoviesObject);
+    setTitle("");
+    setOpeningOpeningText("");
+    setreleaseDate("");
   };
 
   const titleHandler = (event) => {
@@ -36,15 +39,16 @@ const AddMovies = (props) => {
             <input type="text" onChange={titleHandler} value={title} />
           </div>
           <div className="Movies">
-            <label htmlFor="Opening_Text">Opening-Text</label>
-            <input
-              type="textarea"
+            <label htmlFor="Opening_Text">Opening Text</label>
+            <textarea
               onChange={openingtextHandler}
               value={openingtext}
+              rows={5}
+              cols={60}
             />
           </div>
           <div className="Movies">
-            <label htmlFor="Release-Date">Release-Date</label>
+            <label htmlFor="Release-Date">Release Date</label>
             <input
               type="text"
               onChange={releaseDateHandler}
