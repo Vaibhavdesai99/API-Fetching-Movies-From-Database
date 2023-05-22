@@ -1,37 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import MoviesList from "./components/MoviesList";
 import "./App.css";
 
 function App() {
-  // State to store the fetched movies
   const [movies, setMovies] = useState([]);
-  // To show movies are on their way to show on the screen - Loading...
   const [showLoader, setShowLoader] = useState(false);
   const [error, setError] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [retryTimer, setRetryTimer] = useState(null);
+
+  //useEffect in this code is to fetch movie data.
+  //data fetching once when the component is initially rendered.
 
   useEffect(() => {
-    if (retryCount > 0) {
-      const timer = setTimeout(() => {
-        fetchMovieHandler();
-      }, 5000);
-      setRetryTimer(timer);
-    }
-    return () => {
-      clearTimeout(retryTimer);
-    };
-  }, [retryCount]);
+    fetchMovieHandler();
+  }, []);
 
-  // Function to fetch movies data from the API
-  async function fetchMovieHandler() {
+  // useCallback is to memoize the fetchMovieHandler function so that it doesn't get re-created on every render, optimizing performance by preventing unnecessary re-renders of child components that receive this function as a prop.
+  const fetchMovieHandler = useCallback(async () => {
+    setShowLoader(true);
+    setError(null);
     try {
-      setShowLoader(true);
-      setError(null);
-      const response = await fetch("https://swapi.dev/api/film/");
-
+      const response = await fetch("https://swapi.dev/api/films/");
+      console.log(response);
       if (!response.ok) {
-        throw new Error("Something went wrong ...Retrying");
+        throw new Error("Something went wrong ...");
       }
       // Parse the JSON response
       const data = await response.json();
@@ -46,15 +37,11 @@ function App() {
 
       // Update the state with the transformed movies data
       setMovies(transformedMovies);
-      setShowLoader(false);
-      setRetryCount(0);
-      clearTimeout(retryTimer);
     } catch (error) {
       setError(error.message);
-      setShowLoader(false);
-      setRetryCount(retryCount + 1);
     }
-  }
+    setShowLoader(false);
+  }, []);
 
   let content = <p>Found no movies</p>;
 
@@ -63,21 +50,11 @@ function App() {
   }
 
   if (error) {
-    content = (
-      <React.Fragment>
-        <p>{error}</p>
-        <button onClick={fetchMovieHandler}>Retry</button>
-      </React.Fragment>
-    );
+    content = <p>{error}</p>;
   }
 
   if (showLoader) {
     content = <p>Loading ...</p>;
-  }
-
-  function handleCancelRetry() {
-    clearTimeout(retryTimer);
-    setRetryCount(0);
   }
 
   return (
@@ -85,10 +62,7 @@ function App() {
       <section>
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
-      <section>
-        {content}
-        {retryCount > 0 && <button onClick={handleCancelRetry}>Cancel</button>}
-      </section>
+      <section>{content}</section>
     </React.Fragment>
   );
 }
