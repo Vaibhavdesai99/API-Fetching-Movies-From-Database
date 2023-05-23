@@ -9,8 +9,8 @@ const AddMovies = ({ onAddMovie }) => {
     e.preventDefault();
     const MoviesObject = {
       title: title,
-      openingtext: openingtext,
-      releasedate: releasedate,
+      openingText: openingtext,
+      releaseDate: releasedate,
     };
 
     onAddMovie(MoviesObject);
